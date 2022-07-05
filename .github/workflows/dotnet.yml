@@ -17,16 +17,13 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.*
-        source-url: ${{ env.NUGET_URL }}
-    - name: user 
-      run: echo ${USER}
     - name: Restore dependencies
       run: dotnet restore SocketComm
     - name: Build
       run: dotnet build SocketComm --no-restore
     - name: Test
       run: dotnet test SocketComm --no-build --verbosity normal
-    #- name: Build Package
-    #  run: dotnet pack SocketComm --configuration Release
-    #- name: Push Package
-    #  run: dotnet nuget push "SocketComm bin/Release/SocketComm.*.nupkg" --api-key ${{secrets.GITHUB-PACKAGE-KEY}} --skip-suplicate
+    - name: Build Package
+      run: dotnet pack SocketComm --configuration Release
+    - name: Push Package
+      run: dotnet nuget push "SocketComm/bin/Release/SocketComm.*.nupkg" --api-key ${{secrets.GITHUB-PACKAGE-KEY}} --skip-duplicate
