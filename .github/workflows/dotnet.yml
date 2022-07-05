@@ -18,6 +18,8 @@ jobs:
       with:
         dotnet-version: 6.0.*
         source-url: ${{ env.NUGET_URL }}
+    - name: user 
+      run: echo ${USER}
     - name: Restore dependencies
       run: dotnet restore SocketComm
     - name: Build
