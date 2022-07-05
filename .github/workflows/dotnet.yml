@@ -20,12 +20,12 @@ jobs:
     - name: Enter SocketComm
       run: cd SocketComm
     - name: Restore dependencies
-      run: dotnet restore
+      run: cd SocketComm && dotnet restore
     - name: Build
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
-    - name: Build Package
-      run: dotnet pack --configuration Release
-    - name: Push Package
-      run: dotnet nuget push "bin/Release/SocketComm.*.nupkg" --api-key ${{secrets.GITHUB-PACKAGE-KEY}} --skip-suplicate
+    #- name: Build Package
+    #  run: dotnet pack --configuration Release
+    #- name: Push Package
+    #  run: dotnet nuget push "bin/Release/SocketComm.*.nupkg" --api-key ${{secrets.GITHUB-PACKAGE-KEY}} --skip-suplicate
