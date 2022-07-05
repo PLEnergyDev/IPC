@@ -17,10 +17,8 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
-    - name: Enter SocketComm
-      run: cd SocketComm
     - name: Restore dependencies
-      run: cd SocketComm && dotnet restore
+      run: dotnet restore SocketComm
     - name: Build
       run: dotnet build --no-restore
     - name: Test
