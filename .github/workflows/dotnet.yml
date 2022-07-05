@@ -2,7 +2,7 @@ name: .NET
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "ap/publish-actions" ]
   pull_request:
     branches: [ "master" ]
 
@@ -26,4 +26,4 @@ jobs:
     - name: Build Package
       run: dotnet pack --configuration Release
     - name: Push Package
-      run: dotnet nuget push "bin/Release/SocketComm.*.nupkg" --api-key GITHUB-PACKAGE-KEY --skip-suplicate
+      run: dotnet nuget push "bin/Release/SocketComm.*.nupkg" --api-key ${{secrets.GITHUB-PACKAGE-KEY}} --skip-suplicate
