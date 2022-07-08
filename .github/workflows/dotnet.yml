@@ -1,0 +1,34 @@
+name: .NET
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  NAME: SocketComm
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.*
+    - name: Authenticate to GitHub Packages
+      run: dotnet nuget add source --username GITHUB_ACTIONS --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/PLEnergyDev/index.json"
+    - name: Restore dependencies
+      run: dotnet restore $NAME
+    - name: Build
+      run: dotnet build $NAME --no-restore
+    - name: Test
+      run: dotnet test $NAME --no-build --verbosity normal
+    - name: Build Package
+      run: dotnet pack $NAME --configuration Release --no-restore
+    - name: Push Package
+      run: cd $NAME && dotnet nuget push "bin/Release/$NAME.*.nupkg" --api-key ${{secrets.PACKAGE_KEY}} --skip-duplicate --source "github"
