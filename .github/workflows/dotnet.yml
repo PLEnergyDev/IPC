@@ -2,7 +2,7 @@ name: .NET
 
 on:
   push:
-    branches: [ "master", "ap/publish-actions" ]
+    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
