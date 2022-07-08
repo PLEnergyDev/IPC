@@ -26,4 +26,4 @@ jobs:
     - name: Build Package
       run: dotnet pack SocketComm --configuration Release
     - name: Push Package
-      run: cd SocketComm && dotnet nuget push "bin/Release/SocketComm.*.nupkg" --api-key ${{secrets.GITHUB-PACKAGE-KEY}} --skip-duplicate --source "github"
+      run: cd SocketComm && dotnet nuget push "bin/Release/SocketComm.*.nupkg" --api-key ${{secrets.PACKAGE_KEY}} --skip-duplicate --source "github"
