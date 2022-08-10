@@ -157,6 +157,28 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
             return Error;
         }
     }
+
+    public Cmd ExpectCmd(Cmd cmd)
+    {
+        var read = ReadCmd();
+        if (cmd == read)
+        {
+            return read;
+        }
+
+        throw new PipeCmdException($"Expected: {cmd} - Received: {read}");
+    }
+
+    public async Task<Cmd> ExpectCmdAsync(Cmd cmd, CancellationToken ct = default)
+    {
+        var read = await ReadCmdAsync(ct);
+        if (read == cmd)
+        {
+            return read;
+        }
+
+        throw new PipeCmdException($"Expected: {cmd} - Received: {read}");
+    }
     public bool WriteCmd(Cmd cmd)
     {
         try
