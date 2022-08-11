@@ -3,6 +3,7 @@
 #define SCOMM_H
 void writeCmd(int socket, CMD cmd);
 CMD readCmd(int socket);
+int expectCmd(int socket, CMD cmd);
 int connectTo(char *path);
 int serveSingleClient(char *path);
 int shakeHands(int socket);
