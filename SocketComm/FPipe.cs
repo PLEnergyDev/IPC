@@ -14,7 +14,11 @@ using static Cmd;
 public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnumerable<Cmd>
 {
     ILogger<FPipe> Logger { get; }
-    Socket S { get; }
+    private Socket S { get; set; }
+    
+    private string SFile { get; }
+
+    public event EventHandler Listening;
 
     public FPipe(string file, ILogger<FPipe>? logger = null)
     {
@@ -22,10 +26,15 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
         this.Logger = logger ?? (LoggerFactory.Create(b => {
             b.AddConsole();
         }).CreateLogger<FPipe>());
+        SFile = file;
+
+    }
+    public void Connect()
+    {
         Logger.LogInformation("Creating socket endpoint");
-        UnixDomainSocketEndPoint ep = new UnixDomainSocketEndPoint(file);
+        UnixDomainSocketEndPoint ep = new UnixDomainSocketEndPoint(SFile);
         Logger.LogInformation("Creating socket");
-        if (File.Exists(file))
+        if (File.Exists(SFile))
         {
             S = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
             Logger.LogInformation("Connecting...");
@@ -40,15 +49,15 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
             FileSocket.Bind(ep);
             FileSocket.Listen();
             Logger.LogInformation("Listening");
+            Listening?.Invoke(this, EventArgs.Empty);
             S = FileSocket.Accept();
             FileSocket.Disconnect(false);
             FileSocket.Dispose();
             ReceiveHandshake(S);
         }
         Logger.LogInformation("Connected..");
-        
-
     }
+    
     const Int32 MagicHandshakeValue = 25;
     Cmd CmdFromBB(byte[] buffer)
     {
