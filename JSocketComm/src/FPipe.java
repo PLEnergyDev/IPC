@@ -1,13 +1,7 @@
-import jdk.jshell.spi.ExecutionControl;
-
-import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.StandardProtocolFamily;
 import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
@@ -50,6 +44,14 @@ public class FPipe implements AutoCloseable, Iterable<Cmd> {
     public void WriteCmd(Cmd cmd) throws IOException{
         ByteBuffer bb = ByteBuffer.allocate(1);
         channel.write(bb.put(cmd.getValue()).rewind());
+    }
+
+    public Cmd ExpectCmd(Cmd cmd) throws PipeCmdException, IOException {
+        var read = ReadCmd();
+        if(read == cmd){
+            return read;
+        }
+        throw new PipeCmdException(String.format("Expected: %s - Received: %s", cmd, read));
     }
 
 
