@@ -10,6 +10,7 @@ char* GO = "go";
 char* DONE = "done";
 char* READY = "ready";
 char* OK = "ok";
+char* RECEIVE = "receive";
 
 CMD parseCmd(char* cmd){
     printf("[%s]\n", cmd);
@@ -19,6 +20,7 @@ CMD parseCmd(char* cmd){
     if(0==strcmp(GO, cmd)) return Go;
     if(0==strcmp(DONE, cmd)) return Done;
     if(0==strcmp(OK, cmd)) return Ok;
+    if(0==strcmp(RECEIVE, cmd)) return Receive;
 
     // if(0==strcmp(Unknown, cmd)) 
         // return Unknown;
@@ -35,6 +37,7 @@ char* tos(CMD cmd){
         case Done:    return DONE;
         case Ok:      return OK;
         case Ready:   return READY;
+        case Receive: return RECEIVE;
         default:      return UNKNOWN;
     }
 }

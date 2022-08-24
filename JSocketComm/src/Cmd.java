@@ -3,14 +3,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Cmd {
-    Unkown((byte)-3),
+    Unknown((byte)-3),
     Error((byte)-2),
     Stopped((byte)-1),
     Exit((byte)0),
     Go((byte)1),
     Done((byte)2),
     Ready((byte)3),
-    Ok((byte)4);
+    Ok((byte)4),
+    Receive((byte)5);
     private static final Map<Byte, Cmd> VALUE_TO_ENUM_MAP;
     private final byte value;
 
