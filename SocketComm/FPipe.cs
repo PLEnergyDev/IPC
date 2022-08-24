@@ -235,4 +235,32 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
             yield return r;
         } while(r > Exit);
     }
+
+    public void SendValue<T>(T value, Func<T,byte[]> converter)
+    {
+        WriteCmd(Receive);
+        ExpectCmd(Ready);
+        var buf = converter(value);
+        byte[] length = {(byte) buf.Length};
+        S.Send(length);
+        S.Send(buf);
+        ExpectCmd(Ok);
+    }
+
+    public T ReceiveValue<T>(Func<byte[], T> converter)
+    {
+        WriteCmd(Ready);
+        byte[] buffer = new byte[1];
+        S.Receive(buffer);
+        var length = (int)buffer[0];
+        buffer = new byte[length];
+        var rec = S.Receive(buffer);
+        if (rec != length)
+        {
+            //TODO: throw error, maybe try repeat
+        }
+
+        WriteCmd(Ok);
+        return converter(buffer);
+    }
 }
