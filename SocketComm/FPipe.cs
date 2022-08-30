@@ -241,7 +241,11 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
         WriteCmd(Receive);
         ExpectCmd(Ready);
         var buf = converter(value);
-        byte[] length = {(byte) buf.Length};
+        byte[] length = BitConverter.GetBytes(buf.Length);
+        if (BitConverter.IsLittleEndian)
+        {
+            length = length.Reverse().ToArray();
+        }
         S.Send(length);
         S.Send(buf);
         ExpectCmd(Ok);
@@ -250,9 +254,14 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
     public T ReceiveValue<T>(Func<byte[], T> converter)
     {
         WriteCmd(Ready);
-        byte[] buffer = new byte[1];
+        byte[] buffer = new byte[4];
         S.Receive(buffer);
-        var length = (int)buffer[0];
+        if (BitConverter.IsLittleEndian)
+        {
+            buffer = buffer.Reverse().ToArray();
+        }
+        var length = BitConverter.ToInt32(buffer);
+        Console.WriteLine($"Receiving {length} bytes!");
         buffer = new byte[length];
         var rec = S.Receive(buffer);
         if (rec != length)
