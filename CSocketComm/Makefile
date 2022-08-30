@@ -1,6 +1,6 @@
 
 pingpong: pingpong.c scomm.o cmd.o
-	gcc -o pingpong pingpong.c scomm.o cmd.o
+	gcc -o pingpong pingpong.c scomm.o cmd.o -O3
 
 cmd.o: cmd.c cmd.h
 	gcc -c cmd.c -o cmd.o

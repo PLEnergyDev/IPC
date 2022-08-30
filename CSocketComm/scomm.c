@@ -6,6 +6,33 @@
 #include "cmd.h"
 #include "scomm.h"
 
+void reverseArray(char* arr, size_t len){
+    for(int i = 0; i < len / 2; i++) {
+        char temp = arr[i];
+        arr[i] = arr[len - i - 1];
+        arr[len - i - 1] = temp;
+    }
+}
+
+int byteToInt(char* buf, size_t size){
+    int* result = malloc(size);
+    if(isLittleEndian())
+        reverseArray(buf, size);
+    memcpy(result, buf, size);
+    int res = *(result);
+    free(result);
+    return res;
+}
+
+char* intToByte(int value){
+    int size = sizeof(int);
+    char* buf = malloc(size);
+    memcpy(buf, &value, size);
+    if(isLittleEndian())
+        reverseArray(buf, size);
+    return buf;
+}
+
 void writeCmd(int socket, CMD cmd){
     if (write(socket, (char*)&cmd, 1) < 0) {
         perror("error writing to socket");
@@ -28,6 +55,32 @@ int expectCmd(int socket, CMD cmd){
     }
     fprintf(stderr,"Error: Expected: %d - Received: %d\n", cmd, read);
     return 0;
+}
+
+void sendValue(int socket, void* value, size_t size, char*(*converter)(void*, size_t)){
+    writeCmd(socket, Receive);
+    expectCmd(socket,Ready);
+    char* buf = converter(value, size);
+    char* lenbuf = intToByte(size);
+    write(socket, lenbuf, 4);
+    write(socket, buf, size);
+    expectCmd(socket, Ok);
+    free(lenbuf);
+    free(buf);
+}
+
+void* receiveValue(int socket, void*(*converter)(char*, size_t)){
+    writeCmd(socket, Ready);
+    char* buf = malloc(4 * sizeof(char));
+    read(socket, buf, 4);
+    int length = byteToInt(buf, 4);
+    printf("Receiving %d bytes!\n", length);
+    buf = malloc(length * sizeof(char));
+    read(socket, buf, length);
+    void* result = converter(buf, length);
+    writeCmd(socket, Ok);
+    free(buf);
+    return result;
 }
 
 void closeSocket(int socket){
@@ -136,4 +189,10 @@ int shakeHands(int socket){
     }
     printf("...\n");
     return 0;
+}
+
+int isLittleEndian(){
+    int x = 1;
+    char *y = (char*)&x;
+    return (int)*y;
 }

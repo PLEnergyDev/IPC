@@ -24,7 +24,7 @@ CMD parseCmd(char* cmd){
 
     // if(0==strcmp(Unknown, cmd)) 
         // return Unknown;
-    return Unkown;
+    return Unknown;
     
 }
 char* tos(CMD cmd){

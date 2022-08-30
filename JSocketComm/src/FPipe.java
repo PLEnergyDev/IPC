@@ -60,8 +60,7 @@ public class FPipe implements AutoCloseable, Iterable<Cmd> {
         WriteCmd(Cmd.Receive);
         ExpectCmd(Cmd.Ready);
         var buf = converter.apply(value).rewind();
-        byte[] length = {(byte) buf.capacity()};
-        ByteBuffer bb = ByteBuffer.wrap(length);
+        ByteBuffer bb = ByteBuffer.allocate(4).putInt(buf.capacity()).rewind();
         channel.write(bb);
         channel.write(buf);
         ExpectCmd(Cmd.Ok);
@@ -69,9 +68,10 @@ public class FPipe implements AutoCloseable, Iterable<Cmd> {
 
     public <T> T ReceiveValue(Function<ByteBuffer, T> converter) throws IOException {
         WriteCmd(Cmd.Ready);
-        var bb = ByteBuffer.allocate(1);
+        var bb = ByteBuffer.allocate(4);
         channel.read(bb);
-        var length = (int)bb.array()[0];
+        var length = bb.rewind().getInt();
+        System.out.println("Receiving " + length + " bytes!");
         bb = ByteBuffer.allocate(length);
         var rec = channel.read(bb);
         if(rec != length){
