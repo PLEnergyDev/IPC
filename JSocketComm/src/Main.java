@@ -9,7 +9,7 @@ public class Main {
         var pipe = args[0];
         int LoopIterations = 1;
         FPipe p = new FPipe(pipe);
-        Cmd c = Cmd.Unkown;
+        Cmd c = Cmd.Unknown;
         try {
             p.WriteCmd(Cmd.Ready);
             do {

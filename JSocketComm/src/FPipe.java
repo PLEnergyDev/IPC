@@ -7,6 +7,8 @@ import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 public class FPipe implements AutoCloseable, Iterable<Cmd> {
     final int MagicHandshakeValue = 25;
@@ -52,6 +54,31 @@ public class FPipe implements AutoCloseable, Iterable<Cmd> {
             return read;
         }
         throw new PipeCmdException(String.format("Expected: %s - Received: %s", cmd, read));
+    }
+
+    public <T> void SendValue(T value, Function<T, ByteBuffer> converter) throws IOException, PipeCmdException {
+        WriteCmd(Cmd.Receive);
+        ExpectCmd(Cmd.Ready);
+        var buf = converter.apply(value).rewind();
+        byte[] length = {(byte) buf.capacity()};
+        ByteBuffer bb = ByteBuffer.wrap(length);
+        channel.write(bb);
+        channel.write(buf);
+        ExpectCmd(Cmd.Ok);
+    }
+
+    public <T> T ReceiveValue(Function<ByteBuffer, T> converter) throws IOException {
+        WriteCmd(Cmd.Ready);
+        var bb = ByteBuffer.allocate(1);
+        channel.read(bb);
+        var length = (int)bb.array()[0];
+        bb = ByteBuffer.allocate(length);
+        var rec = channel.read(bb);
+        if(rec != length){
+            // TODO: throw error
+        }
+        WriteCmd(Cmd.Ok);
+        return converter.apply(bb.rewind());
     }
 
 
