@@ -1,29 +1,44 @@
-﻿using System.ComponentModel;
-using SocketComm;
+﻿using SocketComm;
 using static SocketComm.Cmd;
 
-namespace SocketComm.PingPong
+if (args.Length < 1)
 {
-    internal class Program
+    Console.Error.WriteLine("usage: [socket]");
+    return;
+}
+FPipe p = new FPipe(args[0]);
+p.Connect();
+p.ExpectCmd(Ready);
+// Always communicate big endian
+var reverse = BitConverter.IsLittleEndian;
+int i = short.MinValue;
+while (i < short.MaxValue)
+{
+    p.SendValue(++i, (val)=>
     {
-        static void Main(string[] args)
+        var result =  BitConverter.GetBytes(val);
+        if (reverse)
         {
-            if (args.Length < 1)
-            {
-                return;
-            }
-            FPipe p = new FPipe(args[0]);
-            p.Connect();
-            int i = -30;
-            while (i < 100)
-            {
-                p.SendValue(i, BitConverter.GetBytes);
-                i = p.ReceiveValue((buf)=>BitConverter.ToInt32(buf,0));
-            }
-
-            p.WriteCmd(Exit);
-            p.Dispose();
-
+            result = result.Reverse().ToArray();
         }
+        return result;
+    });
+    Console.WriteLine($"Server sending {i}");
+    if (p.ReadCmd() == Receive)
+    {
+        i = p.ReceiveValue((buf) =>
+        {
+            if (reverse)
+                buf = buf.Reverse().ToArray();
+            return BitConverter.ToInt32(buf, 0);
+        });
+        Console.WriteLine($"Server received {i}");
+    }
+    else
+    {
+        break;
     }
 }
+
+p.WriteCmd(Exit);
+p.Dispose();
