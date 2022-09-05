@@ -13,7 +13,8 @@ p.WriteCmd(Cmd.Ready);
 Cmd c = p.ReadCmd();
 while (c == Cmd.Receive)
 {
-    var i = p.ReceiveValue((buf)=> SimpleConversion.BytesToArray(buf, SimpleConversion.BytesToNumber<int>));
+    var i = p.ReceiveValue((buf)=> SimpleConversion.BytesToArray(buf, SimpleConversion.BytesToNumber<double>));
+    Console.WriteLine($"Rank: {i.Rank}");
     Console.Write($"Received [");
     foreach (var n in i)
     {

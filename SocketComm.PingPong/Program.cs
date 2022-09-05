@@ -12,10 +12,10 @@ p.Connect();
 p.ExpectCmd(Ready);
 
 int i = short.MinValue;
-var v = new int[] {1, 2,3, 4,5, 6};
+var v = new double[,] {{1.1, 2.2},{3.3, 4.4},{5.5, 6.6}};
 while(i < short.MaxValue)
 {
-    p.SendValue(v, (val)=> SimpleConversion.ArrayToBytes(val, SimpleConversion.NumberToBytes));
+    p.SendValue(v, (val)=> SimpleConversion.ArrayToBytes<double>(val, SimpleConversion.NumberToBytes));
     i = short.MaxValue;
     break;
     if (p.ReadCmd() == Receive)

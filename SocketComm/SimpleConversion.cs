@@ -143,7 +143,7 @@ public static class SimpleConversion
         }
     }
 
-    public static byte[] ArrayToBytes<T>(T[] arr, Func<T,byte[]> converter)
+    public static byte[] ArrayToBytes<T>(Array arr, Func<T,byte[]> converter)
     {
         IEnumerable<byte> results = new List<byte>();
         var rank = arr.Rank;
@@ -155,29 +155,66 @@ public static class SimpleConversion
         
         foreach (var e in arr)
         {
-            results = results.Concat(converter(e));
+            results = results.Concat(converter((T)e));
         }
 
         return results.ToArray();
     }
 
-    public static T[] BytesToArray<T>(byte[] buffer, Func<byte[], T> converter)
+    public static Array BytesToArray<T>(byte[] buffer, Func<byte[], T> converter)
     {
-        var rank = BytesToNumber<int>(buffer,4);
+        int offset = 0;
+        var rank = BytesToNumber<int>(buffer[..(offset+=sizeof(int))]);
         var dimensions = new int[rank];
         var elements = 1;
         for (int i = 0; i < rank; i++)
         {
-            var v = BytesToNumber<int>(buffer, (1+i) * sizeof(int));
+            var v = BytesToNumber<int>(buffer[offset..(offset+=sizeof(int))]);
             dimensions[i] = v;
             elements *= v;
         }
 
-        var result = new T[elements];
-        var size = (buffer.Length - (rank + 1) * sizeof(int)) / elements;
+        var result = Array.CreateInstance(typeof(T),dimensions);
+
+        var position = new int[rank];
+        
+        //TODO: works only when all elements have the same size
+        var size = (buffer.Length - offset) / elements;
+        bool stop = false;
         for (int i = 0; i < elements; i++)
         {
-            result[i] = BytesToNumber<T>(buffer, (rank+1) * sizeof(int) + i * size);
+            var e = BytesToNumber<T>(buffer[offset..(offset+=size)]);
+            result.SetValue(e, position);
+            position[rank-1]++;
+            for (var j = rank -1; j >= 0; j--)
+            {
+                if (position[j] >= dimensions[j])
+                {
+                    position[j] = 0;
+                    if (j > 0)
+                    {
+                        position[j - 1]++;
+                    }
+                    else
+                    {
+                        stop = true;
+                    }
+                    
+                }
+                else
+                {
+                    break;
+                }
+
+                if (stop)
+                {
+                    if (++i != elements)
+                    {
+                        throw new FormatException("Reached end of result array but not end of byte array");
+                    }
+                    break;
+                }
+            }
         }
         return result;
     }
