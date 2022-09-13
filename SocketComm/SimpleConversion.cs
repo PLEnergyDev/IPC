@@ -9,6 +9,8 @@ public static class SimpleConversion
     {
         throw new InvalidOperationException($"Value must be a number type. Is of type {typeof(T)}");
     }
+    
+    //TODO: can maybe made generic with the upcoming generic math feature, see https://devblogs.microsoft.com/dotnet/preview-features-in-net-6-generic-math/ 
     public static byte[] NumberToBytes(int value)
     {
         var result =  BitConverter.GetBytes(value);
@@ -105,11 +107,6 @@ public static class SimpleConversion
         return (T) _bytesToNumber<T>(buffer);
     }
 
-    public static T BytesToNumber<T>(byte[] buffer, int index)
-    {
-        return (T) _bytesToNumber<T>(buffer, buffer.Length - index -1);
-    }
-    
     private static object _bytesToNumber<T>(byte[] buffer, int index = 0)
     {
         if (BitConverter.IsLittleEndian)
@@ -143,8 +140,18 @@ public static class SimpleConversion
         }
     }
 
+    /// <summary>
+    /// Coverts the array <paramref name="arr"/> to a byte array containing first an int representing the rank of the array, then an int for the
+    /// size of each dimension. Then a concatenation of the byte array for each element as the result of applying
+    /// <paramref name="converter"/>
+    /// </summary>
+    /// <param name="arr">Array</param>
+    /// <param name="converter">Function the converts object of type T to byte arrays</param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static byte[] ArrayToBytes<T>(Array arr, Func<T,byte[]> converter)
     {
+        //TODO: how to handle ragged arrays
         IEnumerable<byte> results = new List<byte>();
         var rank = arr.Rank;
         results = results.Concat(NumberToBytes(rank));
@@ -183,7 +190,7 @@ public static class SimpleConversion
         bool stop = false;
         for (int i = 0; i < elements; i++)
         {
-            var e = BytesToNumber<T>(buffer[offset..(offset+=size)]);
+            var e = converter(buffer[offset..(offset+=size)]);
             result.SetValue(e, position);
             position[rank-1]++;
             for (var j = rank -1; j >= 0; j--)
