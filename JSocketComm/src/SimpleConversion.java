@@ -37,7 +37,7 @@ public class SimpleConversion {
         return result;
     }
 
-    public static <T> Array BytesToArray(ByteBuffer buf, Function<ByteBuffer,T> converter){
+    public static <T> Object BytesToArray(ByteBuffer buf, Function<ByteBuffer,T> converter){
         var rank =  buf.getInt();
         var dimension = new int[rank];
         var elements = 1;
@@ -46,7 +46,6 @@ public class SimpleConversion {
             dimension[i] = d;
             elements *= d;
         }
-        var len = buf.getInt();
         var pos = buf.position();
         var obj = converter.apply(buf);
         buf = buf.position(pos);
@@ -65,15 +64,22 @@ public class SimpleConversion {
                 var d = 0;
                 var ar = result;
                 while(ar.getClass().isArray()){
-                    ar = ((Object[])ar)[dims[d]];
+                    var v =  ((Object[])ar)[dims[d]];
+                    if(v != null){
+                        ar = v;
+                    }
+                    else{
+                        break;
+                    }
                     d++;
                 }
                 ((Object[])ar)[dims[d]] = e;
             };
+            arraySet.accept(position);
             position[rank-1]++;
             for (var j = rank -1; j >= 0; j--)
             {
-                if (position[j] >= dimensions[j])
+                if (position[j] >= dimension[j])
                 {
                     position[j] = 0;
                     if (j > 0)
@@ -95,15 +101,13 @@ public class SimpleConversion {
                 {
                     if (++i != elements)
                     {
-                        throw new FormatException("Reached end of result array but not end of byte array");
+                        throw new ArithmeticException("Number of elements in array does not match up");
                     }
                     break;
                 }
             }
         }
-
-
-        return (Array) result;
+        return result;
     }
 
 
