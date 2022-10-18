@@ -3,22 +3,8 @@
 #include <string.h>
 #include "scomm.h"
 #include "cmd.h"
+#include "simpleConversion.h"
 
-void* byteToIntGeneric(char* buf, size_t size){
-    int* result = malloc(size);
-    if(isLittleEndian())
-        reverseArray(buf, size);
-    memcpy(result, buf, size);
-    return result;
-}
-
-char* intToByteGeneric(void* value, size_t size){
-    char* buf = malloc(size);
-    memcpy(buf, value, size);
-    if(isLittleEndian())
-        reverseArray(buf, size);
-    return buf;
-}
 
 int main(int argc, char **argv){
     printf("Is little endian: %d", isLittleEndian());
@@ -34,11 +20,11 @@ int main(int argc, char **argv){
     writeCmd(s, Ready);
     CMD c = readCmd(s);
     while(c == Receive){
-        int* i = (int*)receiveValue(s,byteToIntGeneric);
-        printf("Client received: %d\n", *i);
+        double* i = (double*)receiveValue(s,byteToNumberGeneric);
+        printf("Client received: %f\n", *i);
         *i += 1;
-        sendValue(s, i, sizeof(*i),intToByteGeneric );
-        printf("Client sent: %d\n", *i);
+        sendValue(s, i, sizeof(*i),numberToByteGeneric );
+        printf("Client sent: %f\n", *i);
         c = readCmd(s);
         free(i);
     }

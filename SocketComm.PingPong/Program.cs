@@ -7,20 +7,18 @@ if (args.Length < 1)
     Console.Error.WriteLine("usage: [socket]");
     return;
 }
+
 FPipe p = new FPipe(args[0]);
 p.Connect();
 p.ExpectCmd(Ready);
-
-int i = short.MinValue;
-var v = new double[,] {{1.1,2.2},{3.3,4.4},{5.5,6.6},{7.7,8.8},{9.9,0.987654321}};
-while(i < short.MaxValue)
+Console.WriteLine("Starting loop");
+double i = 0.0 ;
+while(i < 10.0)
 {
-    p.SendValue(v, (val)=> SimpleConversion.ArrayToBytes<double>(val, SimpleConversion.NumberToBytes));
-    i = short.MaxValue;
-    break;
+    p.SendValue(i + 1, SimpleConversion.NumberToBytes);
     if (p.ReadCmd() == Receive)
     {
-        i = p.ReceiveValue(SimpleConversion.BytesToNumber<int>);
+        i = p.ReceiveValue(SimpleConversion.BytesToNumber<double>);
     }
     else
     {
