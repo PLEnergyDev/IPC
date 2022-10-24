@@ -3,13 +3,15 @@
 //
 #include "scomm.h"
 #include "simpleConversion.h"
+#include <stddef.h>
+#include <stdio.h>
 
 /// Converts a byte array as char* to a void pointer that can be cast to a number type
 /// \param buf char* containing the byte array to be converted, assumes big-endian
 /// \param size the size in bytes of the desired result
 /// \return void* to the result
 void* byteToNumberGeneric(char* buf, size_t size){
-    int* result = malloc(size);
+    void* result = malloc(size);
     if(isLittleEndian())
         reverseArray(buf, size);
     memcpy(result, buf, size);
@@ -28,6 +30,7 @@ char* numberToByteGeneric(void* value, size_t size){
     return buf;
 }
 
+
 /// Convert an array of single numeric values into a char* containing a byte array representing the array.
 /// Assumes a row-first array layout. Single values will be big-endian.
 /// \param array void* containing array to be converted
@@ -35,40 +38,73 @@ char* numberToByteGeneric(void* value, size_t size){
 /// \param rank the rank (number of dimensions) of the array
 /// \param dimensions an int array of size rank containing the size of each dimension
 /// \return a char* containing [rank, dimension sizes, values] big-endian
-char* arrayToBytesGeneric(void* array, size_t element_size, int rank, int* dimensions) {
-    int result_size = 0;
-    result_size += sizeof(int) * (rank + 1);
-    int elements = 1;
-    for (int i = 0; i < rank; i++) {
-        elements *= dimensions[i];
-    }
-    result_size += elements * element_size;
-    char *result = malloc(result_size);
-    int offset = 0;
-    //TODO: flip in little-endian
-    memcpy(result, &rank, sizeof(int));
-    offset += sizeof(int);
-    memcpy(result + offset, dimensions, sizeof(int) * rank);
-    offset += sizeof(int) * rank;
-    memcpy(result + offset, array, element_size * elements);
-    if(isLittleEndian()){
-        for(int i = 0; i < elements; i++){
-            reverseArray(result + offset + (i * element_size), element_size);
+converter arrayToBytesGeneric(int rank, int* dimensions) {
+    char* foo(void* array, size_t element_size){
+        int result_size = 0;
+        result_size += sizeof(int) * (rank + 1);
+        int elements = 1;
+        for (int i = 0; i < rank; i++) {
+            elements *= dimensions[i];
         }
+        result_size += elements * element_size;
+        char *result = malloc(result_size);
+        int offset = 0;
+        // Put rank
+        memcpy(result, &rank, sizeof(int));
+        if(isLittleEndian()){
+            reverseArray(result+offset, sizeof(int));
+        }
+        offset += sizeof(int);
+
+        // Put dimensions
+        memcpy(result + offset, dimensions, sizeof(int) * rank);
+        if(isLittleEndian()){
+            for(int i = 0; i < rank; i++){
+                reverseArray(result+offset + (i * sizeof(int)), sizeof(int));
+            }
+        }
+
+        offset += sizeof(int) * rank;
+
+        // Put values
+        memcpy(result + offset, array, element_size * elements);
+        if(isLittleEndian()){
+            for(int i = 0; i < elements; i++){
+                reverseArray(result + offset + (i * element_size), element_size);
+            }
+        }
+        return result;
     }
-    return result;
+
+    return (converter)&foo;
 }
 
 
 void* bytesToArrayGeneric(char* buffer, size_t size){
     int offset = 0;
     int rank = 0;
+    printf("%s\n", buffer);
+    //Get rank
     memcpy(&rank, buffer, sizeof(int));
-    //TODO: flip if little-endian
+    if(isLittleEndian()){
+        reverseArray((char*)&rank, sizeof(int));
+    }
     offset += sizeof(int);
+    printf("Rank is %d\n", rank);
+
+    // Get dimensions
     int* dimension = malloc(rank * sizeof(int));
     memcpy(dimension, buffer + offset, sizeof(int) * rank);
     offset += sizeof(int) * rank;
+    if(isLittleEndian()){
+        for(int i = 0; i < rank; i++){
+            reverseArray((char*)dimension + (i * sizeof(int)), sizeof(int));
+
+        }
+    }
+
+
+    // Get values
     int result_size = 1;
     for(int i = 0; i < rank; i++){
         result_size *= dimension[i];

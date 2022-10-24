@@ -5,6 +5,7 @@
 #include<unistd.h>
 #include "cmd.h"
 #include "scomm.h"
+#include "simpleConversion.h"
 
 void reverseArray(char* arr, size_t len){
     for(int i = 0; i < len / 2; i++) {
@@ -57,10 +58,11 @@ int expectCmd(int socket, CMD cmd){
     return 0;
 }
 
-void sendValue(int socket, void* value, size_t size, char*(*converter)(void*, size_t)){
+void sendValue(int socket, void* value, size_t size, converter con){
     writeCmd(socket, Receive);
     expectCmd(socket,Ready);
-    char* buf = converter(value, size);
+    char* buf = con(value, size);
+    // TODO: this size does not work for array
     char* lenbuf = intToByte(size);
     write(socket, lenbuf, 4);
     write(socket, buf, size);
@@ -69,7 +71,7 @@ void sendValue(int socket, void* value, size_t size, char*(*converter)(void*, si
     free(buf);
 }
 
-void* receiveValue(int socket, void*(*converter)(char*, size_t)){
+void* receiveValue(int socket, void*(*con)(char*, size_t), size_t size){
     writeCmd(socket, Ready);
     char* buf = malloc(4 * sizeof(char));
     read(socket, buf, 4);
@@ -77,7 +79,11 @@ void* receiveValue(int socket, void*(*converter)(char*, size_t)){
     printf("Receiving %d bytes!\n", length);
     buf = malloc(length * sizeof(char));
     read(socket, buf, length);
-    void* result = converter(buf, length);
+    /*for(int i = 0; i < length; i++){
+        printf("\\%02hhx", buf[i]);
+    }
+    printf("\n");*/
+    void* result = con(buf, size);
     writeCmd(socket, Ok);
     free(buf);
     return result;

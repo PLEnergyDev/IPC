@@ -6,6 +6,8 @@
 #include "simpleConversion.h"
 
 
+
+
 int main(int argc, char **argv){
     printf("Is little endian: %d", isLittleEndian());
     if(argc<=1){
@@ -20,13 +22,17 @@ int main(int argc, char **argv){
     writeCmd(s, Ready);
     CMD c = readCmd(s);
     while(c == Receive){
-        double* i = (double*)receiveValue(s,byteToNumberGeneric);
-        printf("Client received: %f\n", *i);
-        *i += 1;
-        sendValue(s, i, sizeof(*i),numberToByteGeneric );
-        printf("Client sent: %f\n", *i);
-        c = readCmd(s);
+
+        int* i = (int*)receiveValue(s,bytesToArrayGeneric, sizeof(int));
+        printf("Client received: \n");
+        for(int j = 0; j < 4; j++){
+            printf("%i,", i[j]);
+        }
+        int dimensions[] = {4};
+        sendValue(s, i, 24, arrayToBytesGeneric(1, dimensions));
         free(i);
+        writeCmd(s, Exit);
+        c = readCmd(s);
     }
     closeSocket(s);
 }

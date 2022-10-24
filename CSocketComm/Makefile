@@ -4,6 +4,7 @@ pingpong: pingpong.c scomm.o cmd.o conversion.o
 
 cmd.o: cmd.c cmd.h
 	gcc -c cmd.c -o cmd.o
+
 scomm.o: scomm.c scomm.h
 	gcc -c scomm.c -o scomm.o
 

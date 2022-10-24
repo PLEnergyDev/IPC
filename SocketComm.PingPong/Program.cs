@@ -12,13 +12,14 @@ FPipe p = new FPipe(args[0]);
 p.Connect();
 p.ExpectCmd(Ready);
 Console.WriteLine("Starting loop");
-double i = 0.0 ;
-while(i < 10.0)
+int[] i = {1,2,3,4};
+while(true)
 {
-    p.SendValue(i + 1, SimpleConversion.NumberToBytes);
+    p.SendValue(i, (x)=> SimpleConversion.ArrayToBytes<int>(x,SimpleConversion.NumberToBytes));
     if (p.ReadCmd() == Receive)
     {
-        i = p.ReceiveValue(SimpleConversion.BytesToNumber<double>);
+        i = (int[])p.ReceiveValue((x)=> SimpleConversion.BytesToArray(x,SimpleConversion.BytesToNumber<int>));
+        Console.WriteLine(i);
     }
     else
     {
