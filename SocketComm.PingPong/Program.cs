@@ -19,7 +19,11 @@ while(true)
     if (p.ReadCmd() == Receive)
     {
         i = (int[])p.ReceiveValue((x)=> SimpleConversion.BytesToArray(x,SimpleConversion.BytesToNumber<int>));
-        Console.WriteLine(i);
+        foreach (var e in i)
+        {
+            Console.WriteLine(e);
+        }
+        
     }
     else
     {

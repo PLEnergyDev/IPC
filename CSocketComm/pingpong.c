@@ -28,11 +28,14 @@ int main(int argc, char **argv){
         for(int j = 0; j < 4; j++){
             printf("%i,", i[j]);
         }
+        printf("\n");
         int dimensions[] = {4};
-        sendValue(s, i, 24, arrayToBytesGeneric(1, dimensions));
+        sendArray(s, i, sizeof(int), 1, dimensions, arrayToBytesGeneric);
         free(i);
         writeCmd(s, Exit);
-        c = readCmd(s);
+        break;
+        //c = readCmd(s);
     }
+
     closeSocket(s);
 }

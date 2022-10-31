@@ -22,12 +22,12 @@ void* byteToNumberGeneric(char* buf, size_t size){
 /// \param value a void* to the value
 /// \param size the size of the value
 /// \return a char* containing the byte array representing the value, big-endian
-char* numberToByteGeneric(void* value, size_t size){
-    char* buf = malloc(size);
-    memcpy(buf, value, size);
+int numberToByteGeneric(char* buffer, void* value, size_t size){
+    buffer = malloc(size);
+    memcpy(buffer, value, size);
     if(isLittleEndian())
-        reverseArray(buf, size);
-    return buf;
+        reverseArray(buffer, size);
+    return size;
 }
 
 
@@ -38,45 +38,55 @@ char* numberToByteGeneric(void* value, size_t size){
 /// \param rank the rank (number of dimensions) of the array
 /// \param dimensions an int array of size rank containing the size of each dimension
 /// \return a char* containing [rank, dimension sizes, values] big-endian
-converter arrayToBytesGeneric(int rank, int* dimensions) {
-    char* foo(void* array, size_t element_size){
-        int result_size = 0;
-        result_size += sizeof(int) * (rank + 1);
-        int elements = 1;
-        for (int i = 0; i < rank; i++) {
-            elements *= dimensions[i];
-        }
-        result_size += elements * element_size;
-        char *result = malloc(result_size);
-        int offset = 0;
-        // Put rank
-        memcpy(result, &rank, sizeof(int));
-        if(isLittleEndian()){
-            reverseArray(result+offset, sizeof(int));
-        }
-        offset += sizeof(int);
+char* arrayToBytesGeneric(void* value, size_t element_size, int rank, int* dimensions) {
+    int result_size = 0;
+    result_size += sizeof(int) * (rank + 1);
+    int elements = 1;
+    for (int i = 0; i < rank; i++) {
+        elements *= dimensions[i];
+    }
+    result_size += elements * element_size;
+    char* buffer = malloc(result_size);
+    int offset = 0;
+    // Put rank
+    memcpy(buffer, &rank, sizeof(int));
+    if(isLittleEndian()){
+        reverseArray(buffer+offset, sizeof(int));
+    }
+    offset += sizeof(int);
+    for(int i = 0; i < result_size; i++){
+        printf("\\%02hhx", buffer[i]);
+    }
+    printf("\n");
 
-        // Put dimensions
-        memcpy(result + offset, dimensions, sizeof(int) * rank);
-        if(isLittleEndian()){
-            for(int i = 0; i < rank; i++){
-                reverseArray(result+offset + (i * sizeof(int)), sizeof(int));
-            }
+    // Put dimensions
+    memcpy(buffer + offset, dimensions, sizeof(int) * rank);
+    if(isLittleEndian()){
+        for(int i = 0; i < rank; i++){
+            reverseArray(buffer+offset + (i * sizeof(int)), sizeof(int));
         }
-
-        offset += sizeof(int) * rank;
-
-        // Put values
-        memcpy(result + offset, array, element_size * elements);
-        if(isLittleEndian()){
-            for(int i = 0; i < elements; i++){
-                reverseArray(result + offset + (i * element_size), element_size);
-            }
-        }
-        return result;
     }
 
-    return (converter)&foo;
+    offset += sizeof(int) * rank;
+
+    for(int i = 0; i < result_size; i++){
+        printf("\\%02hhx", buffer[i]);
+    }
+    printf("\n");
+
+    // Put values
+    memcpy(buffer + offset, value, element_size * elements);
+    if(isLittleEndian()){
+        for(int i = 0; i < elements; i++){
+            reverseArray(buffer + offset + (i * element_size), element_size);
+        }
+    }
+
+    for(int i = 0; i < result_size; i++){
+        printf("\\%02hhx", buffer[i]);
+    }
+    printf("\n");
+    return buffer;
 }
 
 

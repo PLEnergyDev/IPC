@@ -6,10 +6,11 @@
 #include <stddef.h>
 #ifndef CSOCKETCOMM_SIMPLECONVERSION_H
 #define CSOCKETCOMM_SIMPLECONVERSION_H
-typedef char*(*converter) (char*, size_t);
+typedef int(*converter) (char*, void*, size_t);
+typedef char*(*arrayConverter)(void*, size_t, int, int*);
 void* byteToNumberGeneric(char* buf, size_t size);
-char* numberToByteGeneric(void* value, size_t size);
+int numberToByteGeneric(char* buffer, void* value, size_t size);
 void* bytesToArrayGeneric(char* buffer, size_t size);
-converter arrayToBytesGeneric( int rank, int* dimensions);
+char* arrayToBytesGeneric(void* value, size_t element_size, int rank, int* dimensions);
 
 #endif //CSOCKETCOMM_SIMPLECONVERSION_H
