@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketComm", "SocketComm\So
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketComm.Client", "SocketComm.Client\SocketComm.Client.csproj", "{EB043B44-9D4F-42AA-B917-C98156E202E5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examples", "Examples\Examples.csproj", "{4EC3C9FD-B197-434E-8904-6EA0F452BB08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketComm.Examples", "SocketComm.Examples\SocketComm.Examples.csproj", "{6C371FCA-B8F0-4D7D-B635-BF908D4D895A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{EB043B44-9D4F-42AA-B917-C98156E202E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB043B44-9D4F-42AA-B917-C98156E202E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB043B44-9D4F-42AA-B917-C98156E202E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EC3C9FD-B197-434E-8904-6EA0F452BB08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EC3C9FD-B197-434E-8904-6EA0F452BB08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EC3C9FD-B197-434E-8904-6EA0F452BB08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EC3C9FD-B197-434E-8904-6EA0F452BB08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C371FCA-B8F0-4D7D-B635-BF908D4D895A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C371FCA-B8F0-4D7D-B635-BF908D4D895A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C371FCA-B8F0-4D7D-B635-BF908D4D895A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C371FCA-B8F0-4D7D-B635-BF908D4D895A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
