@@ -11,7 +11,6 @@ if (args.Length < 1)
 FPipe p = new FPipe(args[0]);
 p.Connect();
 p.ExpectCmd(Ready);
-Console.WriteLine("Starting loop");
 int[] i = {1,2,3,4};
 while(true)
 {

@@ -75,14 +75,21 @@ void sendValue(int socket, void* value, size_t size, converter con){
 void sendArray(int socket, void* value, size_t element_size, int rank, int* dimensions, arrayConverter con){
     writeCmd(socket, Receive);
     expectCmd(socket,Ready);
-    int sendSize = 24;
+    //Calculate array size
+    int sendSize = 1;
+    for(int i = 0; i < rank; i++){
+        sendSize *= dimensions[i];
+    }
+    sendSize *= element_size;
+    sendSize += (rank + 1) * sizeof(int);
+
     char* buf = con(value, element_size, rank, dimensions);
-    printf("Sending: %d bytes \n", sendSize);
+    /*printf("Sending: %d bytes \n", sendSize);
     printf("Value: " );
     for(int i = 0; i < sendSize; i++){
         printf("\\%02hhx", buf[i]);
     }
-    printf("\n");
+    printf("\n");*/
     char* lenbuf = intToByte(sendSize);
     write(socket, lenbuf, 4);
     write(socket, buf, sendSize);
@@ -99,10 +106,10 @@ void* receiveValue(int socket, void*(*con)(char*, size_t), size_t size){
     printf("Receiving %d bytes!\n", length);
     buf = malloc(length * sizeof(char));
     read(socket, buf, length);
-    for(int i = 0; i < length; i++){
+    /*for(int i = 0; i < length; i++){
         printf("\\%02hhx", buf[i]);
     }
-    printf("\n");
+    printf("\n");*/
     void* result = con(buf, size);
     writeCmd(socket, Ok);
     free(buf);

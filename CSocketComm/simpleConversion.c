@@ -54,10 +54,6 @@ char* arrayToBytesGeneric(void* value, size_t element_size, int rank, int* dimen
         reverseArray(buffer+offset, sizeof(int));
     }
     offset += sizeof(int);
-    for(int i = 0; i < result_size; i++){
-        printf("\\%02hhx", buffer[i]);
-    }
-    printf("\n");
 
     // Put dimensions
     memcpy(buffer + offset, dimensions, sizeof(int) * rank);
@@ -69,11 +65,6 @@ char* arrayToBytesGeneric(void* value, size_t element_size, int rank, int* dimen
 
     offset += sizeof(int) * rank;
 
-    for(int i = 0; i < result_size; i++){
-        printf("\\%02hhx", buffer[i]);
-    }
-    printf("\n");
-
     // Put values
     memcpy(buffer + offset, value, element_size * elements);
     if(isLittleEndian()){
@@ -81,11 +72,6 @@ char* arrayToBytesGeneric(void* value, size_t element_size, int rank, int* dimen
             reverseArray(buffer + offset + (i * element_size), element_size);
         }
     }
-
-    for(int i = 0; i < result_size; i++){
-        printf("\\%02hhx", buffer[i]);
-    }
-    printf("\n");
     return buffer;
 }
 
