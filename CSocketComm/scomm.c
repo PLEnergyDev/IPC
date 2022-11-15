@@ -135,6 +135,7 @@ int unixsock(){
         perror("socket failed");
         return -1;
     }
+    return fd;
 }
 
 void rev(char *buf, int l){
@@ -165,8 +166,9 @@ int serveSingleClient(char *path){
     socklen_t size = sizeof(struct sockaddr_un);
     int clientSocket = accept(listensocket, (struct sockaddr*)(&address), &size);
     close(listensocket);
+    remove(path);
     if(receiveHandshake(clientSocket)<0){
-        fprintf(stderr, "Bad handsake...\n");
+        fprintf(stderr, "Bad handshake...\n");
         return -1;
     }
     return clientSocket;
