@@ -1,6 +1,4 @@
 #include "../../CSocketComm/scomm.h"
-#include "../../CSocketComm/cmd.h"
-#include <stdlib.h>
 #include <stdio.h>
 
 int main(int argc, char **argv){

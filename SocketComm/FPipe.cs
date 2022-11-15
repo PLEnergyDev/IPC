@@ -203,12 +203,14 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
 
     public void Dispose()
     {
+        Logger.LogInformation("Closing pipe");
         S?.Dispose();
         GC.SuppressFinalize(this);
     }
 
     public ValueTask DisposeAsync()
     {
+        Logger.LogInformation("Closing pipe async");
         S?.Dispose();
         GC.SuppressFinalize(this);
         return ValueTask.CompletedTask;

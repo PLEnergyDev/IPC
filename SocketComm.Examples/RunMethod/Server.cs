@@ -1,5 +1,6 @@
-using SocketComm;
 using static SocketComm.Cmd;
+
+namespace SocketComm.Examples.RunMethod;
 
 static class Server
 {
@@ -7,18 +8,26 @@ static class Server
     {
         FPipe p = new FPipe("/tmp/hello.pipe");
         p.Connect();
-        p.ExpectCmd(Ready);
-        while(true)
+        try
         {
             p.ExpectCmd(Ready);
-            p.WriteCmd(Go);
-            p.ExpectCmd(Done);
-            break;
+            while (true)
+            {
+                p.ExpectCmd(Ready);
+                p.WriteCmd(Go);
+                p.ExpectCmd(Done);
+                break;
+            }
         }
-        p.WriteCmd(Exit);
-        p.Dispose();
+        catch (Exception e)
+        {
+            Console.Error.WriteLine("An error occured with the pipe: " + e);
+        }
+        finally
+        {
+            p.WriteCmd(Exit);
+            p.Dispose();
+        }
+        
     }
 }
-
-
-
