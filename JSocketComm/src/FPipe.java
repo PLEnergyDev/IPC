@@ -29,6 +29,7 @@ public class FPipe implements AutoCloseable, Iterable<Cmd> {
             ss.bind(address);
             channel = ss.accept();
             ss.close();
+            Files.delete(Path.of(file));
             System.out.println("handshake...");
             ReceiveHand(channel);
             System.out.println("done");

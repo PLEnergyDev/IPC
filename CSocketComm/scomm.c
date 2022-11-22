@@ -61,7 +61,7 @@ int expectCmd(int socket, CMD cmd){
 void sendValue(int socket, void* value, size_t size, converter con){
     writeCmd(socket, Receive);
     expectCmd(socket,Ready);
-    char* buf;
+    char* buf = malloc(size);
     int sendSize = con(buf, value, size);
     printf("Sending: %d bytes \n", sendSize);
     char* lenbuf = intToByte(sendSize);

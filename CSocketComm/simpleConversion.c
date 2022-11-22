@@ -23,7 +23,6 @@ void* byteToNumberGeneric(char* buf, size_t size){
 /// \param size the size of the value
 /// \return a char* containing the byte array representing the value, big-endian
 int numberToByteGeneric(char* buffer, void* value, size_t size){
-    buffer = malloc(size);
     memcpy(buffer, value, size);
     if(isLittleEndian())
         reverseArray(buffer, size);
