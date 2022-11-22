@@ -2,13 +2,13 @@
 #include "../../CSocketComm/simpleConversion.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
+#include <float.h>
 
 int main(int argc, char **argv){
 
     printf("Connecting...\n");
 
-    int s = serveSingleClient("/tmp/intvalue.pipe");
+    int s = serveSingleClient("/tmp/floatvalue.pipe");
 
     if(s<0){
         printf("Bad socket...");
@@ -17,19 +17,19 @@ int main(int argc, char **argv){
     printf("Connection successful!\n");
 
     expectCmd(s,Ready);
-    int i = 2;
-    while (i < INT_MAX && i > 1)
+    float i = 1.1f;
+    while (i < FLT_MAX && i > 1)
     {
-        printf("Sending %d\n", i);
-        sendValue(s, &i, sizeof(int), numberToByteGeneric);
+        printf("Sending %f\n", i);
+        sendValue(s, &i, sizeof(float), numberToByteGeneric);
         expectCmd(s, Ready);
         writeCmd(s, Go);
         expectCmd(s, Done);
         expectCmd(s, Receive);
-        int* res = (int*) receiveValue(s, byteToNumberGeneric, sizeof(int));
+        float* res = (float*) receiveValue(s, byteToNumberGeneric, sizeof(float));
         i = *res;
         free(res);
-        printf("Received %d\n", i);
+        printf("Received %f\n", i);
     }
 
     closeSocket(s);

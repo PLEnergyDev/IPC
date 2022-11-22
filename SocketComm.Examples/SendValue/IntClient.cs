@@ -6,7 +6,7 @@ public class IntClient
 {
     public static void Main()
     {
-        FPipe p = new FPipe("/tmp/hello.pipe");
+        FPipe p = new FPipe("/tmp/intvalue.pipe");
         p.Connect();
         p.WriteCmd(Ready);
         Cmd c;

@@ -12,7 +12,11 @@ add_executable(RunMethod.Server
 add_executable(SendValue.IntServer
         SendValue/IntServer.c ../CSocketComm/scomm.h ../CSocketComm/scomm.c ../CSocketComm/cmd.h ../CSocketComm/cmd.h ../CSocketComm/simpleConversion.c ../CSocketComm/simpleConversion.h)
 
-
 add_executable(SendValue.IntClient
         SendValue/IntClient.c ../CSocketComm/scomm.h ../CSocketComm/scomm.c ../CSocketComm/cmd.h ../CSocketComm/cmd.h ../CSocketComm/simpleConversion.c ../CSocketComm/simpleConversion.h)
 
+add_executable(SendValue.FloatClient
+        SendValue/FloatClient.c ../CSocketComm/scomm.h ../CSocketComm/scomm.c ../CSocketComm/cmd.h ../CSocketComm/cmd.h ../CSocketComm/simpleConversion.c ../CSocketComm/simpleConversion.h)
+
+add_executable(SendValue.FloatServer
+        SendValue/FloatServer.c ../CSocketComm/scomm.h ../CSocketComm/scomm.c ../CSocketComm/cmd.h ../CSocketComm/cmd.h ../CSocketComm/simpleConversion.c ../CSocketComm/simpleConversion.h)

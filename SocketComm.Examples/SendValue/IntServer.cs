@@ -5,7 +5,7 @@ public class IntServer
 {
     public static void Main()
     {
-        FPipe p = new FPipe("/tmp/hello.pipe");
+        FPipe p = new FPipe("/tmp/intvalue.pipe");
         p.Connect();
         try
         {

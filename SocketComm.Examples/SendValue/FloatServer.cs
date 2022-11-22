@@ -5,7 +5,7 @@ public class FloatServer
 {
     public static void Main()
     {
-        FPipe p = new FPipe("/tmp/hello.pipe");
+        FPipe p = new FPipe("/tmp/floatvalue.pipe");
         p.Connect();
         try
         {
