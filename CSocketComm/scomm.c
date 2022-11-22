@@ -195,11 +195,24 @@ int connectTo(char *path){
 
 int receiveHandshake(int socket){
     int32_t k;
-    if(4!=read(socket, (char*)&k, sizeof(int32_t))){
+    int32_t hsValue = 25;
+    char* buffer = malloc(4);
+    if(4!=read(socket, buffer, sizeof(int32_t))){
         printf("Error receiving handshake");
         return -2;
     }
-    if(4!=write(socket, (char*)(&k), sizeof(int32_t))){
+    if(isLittleEndian()){
+        reverseArray(buffer, 4);
+    }
+    memcpy(&k, buffer, 4);
+    if(hsValue!=k){
+        printf("Bad handshake response: %d\n", k);
+        return -3;
+    }
+    if(isLittleEndian()){
+        reverseArray(buffer,4);
+    }
+    if(4!=write(socket, buffer, sizeof(int32_t))){
         printf("Error replying handshake!");
         return -1;
     }
@@ -209,14 +222,23 @@ int shakeHands(int socket){
     printf("shaking hands");
     int32_t k = 25;
     int32_t result;
-    if(4!=write(socket, (char*)(&k), sizeof(int32_t))){
+    char* buffer = malloc(4);
+    memcpy(buffer, &k, 4);
+    if(isLittleEndian()){
+        reverseArray(buffer, 4);
+    }
+    if(4!=write(socket, buffer, sizeof(int32_t))){
         printf("Error initializing handshake!");
         return -1;
     }
-    if(4!=read(socket, (char*)&result, sizeof(int32_t))){
+    if(4!=read(socket, buffer, sizeof(int32_t))){
         printf("Error receiving handshake");
         return -2;
     }
+    if(isLittleEndian()){
+        reverseArray(buffer, 4);
+    }
+    memcpy(&result, buffer, 4);
 
     if(result!=k){
         printf("Bad handshake response: %d\n", result);

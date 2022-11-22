@@ -103,8 +103,16 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
     public void ShakeHands(Socket socket)
     {
         var data = BitConverter.GetBytes(MagicHandshakeValue);
+        if (BitConverter.IsLittleEndian)
+        {
+            data = data.Reverse().ToArray();
+        }
         socket.Send(data, SocketFlags.None);
         socket.Receive(data, SocketFlags.None);
+        if (BitConverter.IsLittleEndian)
+        {
+            data = data.Reverse().ToArray();
+        }
         ValidateHandshake(data);
     }
 
@@ -114,11 +122,20 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
         Int32 result;
         Logger.LogInformation("Waiting for handshake");
         socket.Receive(data, SocketFlags.None);
+        if (BitConverter.IsLittleEndian)
+        {
+            data = data.Reverse().ToArray();
+        }
         result = BitConverter.ToInt32(data);
         Logger.LogInformation($"[{nameof(ReceiveHandshake)}] Read: {Convert.ToHexString(data)}/{result}");
-        BitConverter.GetBytes(MagicHandshakeValue).CopyTo(data.AsMemory());
-        socket.Send(data);
         ValidateHandshake(data);
+        BitConverter.GetBytes(MagicHandshakeValue).CopyTo(data.AsMemory());
+        if (BitConverter.IsLittleEndian)
+        {
+            data = data.Reverse().ToArray();
+        }
+        socket.Send(data);
+        
     }
 
     public async Task<Cmd> ReadCmdAsync(CancellationToken ct = default)

@@ -17,6 +17,7 @@ public class FPipe implements AutoCloseable, Iterable<Cmd> {
     public FPipe(String file) throws IOException {
 
         UnixDomainSocketAddress address = UnixDomainSocketAddress.of(file);
+        System.out.println("Connecting...");
         if (Files.exists(Path.of(file)))
         {
             channel = SocketChannel.open(StandardProtocolFamily.UNIX);
@@ -33,8 +34,8 @@ public class FPipe implements AutoCloseable, Iterable<Cmd> {
             System.out.println("handshake...");
             ReceiveHand(channel);
             System.out.println("done");
-
         }
+        System.out.println("Connection successful!");
     }
 
     public Cmd ReadCmd() throws IOException{
