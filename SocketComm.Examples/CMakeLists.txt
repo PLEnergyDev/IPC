@@ -20,3 +20,9 @@ add_executable(SendValue.FloatClient
 
 add_executable(SendValue.FloatServer
         SendValue/FloatServer.c ../CSocketComm/scomm.h ../CSocketComm/scomm.c ../CSocketComm/cmd.h ../CSocketComm/cmd.h ../CSocketComm/simpleConversion.c ../CSocketComm/simpleConversion.h)
+
+add_executable(SendArray.OneDClient
+        SendArray/OneDClient.c ../CSocketComm/scomm.h ../CSocketComm/scomm.c ../CSocketComm/cmd.h ../CSocketComm/cmd.h ../CSocketComm/simpleConversion.c ../CSocketComm/simpleConversion.h)
+
+add_executable(SendArray.OneDServer
+        SendArray/OneDServer.c ../CSocketComm/scomm.h ../CSocketComm/scomm.c ../CSocketComm/cmd.h ../CSocketComm/cmd.h ../CSocketComm/simpleConversion.c ../CSocketComm/simpleConversion.h)

@@ -28,27 +28,17 @@ public class TwoDClient
             Console.WriteLine("]");
             p.WriteCmd(Ready);
             p.ExpectCmd(Go);
-            i = Bench(i);
+            var res = Bench(i);
             p.WriteCmd(Done);
-            Console.Write("Sending [");
-            for (int a = 0; a < i.GetLength(0); a++)
-            {
-                Console.Write("[");
-                for (int b = 0; b < i.GetLength(1); b++)
-                {
-                    Console.Write(i[a,b] + ", ");
-                }
-                Console.Write("], ");
-            }
-            Console.WriteLine("]");
-            p.SendValue(i, (val) => SimpleConversion.ArrayToBytes<int>(val, SimpleConversion.NumberToBytes));
+            Console.WriteLine($"Sending {res}");
+            p.SendValue(res, SimpleConversion.NumberToBytes);
             c = p.ReadCmd();
         }
 
         p.Dispose();
     }
 
-    public static int[,] Bench(int[,] i)
+    public static int Bench(int[,] i)
     {
         var sum = 0;
         foreach (var e in i)
@@ -56,14 +46,6 @@ public class TwoDClient
             sum += e;
         }
 
-        for (int a = 0; a < i.GetLength(0); a++)
-        {
-            for (int b = 0; b < i.GetLength(1); b++)
-            {
-                i[a, b] += sum;
-            }
-        }
-
-        return i;
+        return sum;
     }
 }

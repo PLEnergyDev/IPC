@@ -11,38 +11,26 @@ public class TwoDServer
         {
             p.ExpectCmd(Ready);
             int[,] i = {{0,1},{2,3},{4,5},{6,7},{8,9}};
-            
-            while (i[0,0] < int.MaxValue && i[0,0] >= 0)
+            Console.Write("Sending [");
+            for (int a = 0; a < i.GetLength(0); a++)
             {
-                Console.Write("Sending [");
-                for (int a = 0; a < i.GetLength(0); a++)
+                Console.Write("[");
+                for (int b = 0; b < i.GetLength(1); b++)
                 {
-                    Console.Write("[");
-                    for (int b = 0; b < i.GetLength(1); b++)
-                    {
-                        Console.Write(i[a,b] + ", ");
-                    }
-                    Console.Write("], ");
+                    Console.Write(i[a, b] + ", ");
                 }
-                Console.WriteLine("]");
-                p.SendValue(i, (val) => SimpleConversion.ArrayToBytes<int>(val, SimpleConversion.NumberToBytes));
-                p.ExpectCmd(Ready);
-                p.WriteCmd(Go);
-                p.ExpectCmd(Done);
-                p.ExpectCmd(Receive);
-                i =(int[,]) p.ReceiveValue((val) => SimpleConversion.BytesToArray(val, SimpleConversion.BytesToNumber<int>));
-                Console.Write("Received [");
-                for (int a = 0; a < i.GetLength(0); a++)
-                {
-                    Console.Write("[");
-                    for (int b = 0; b < i.GetLength(1); b++)
-                    {
-                        Console.Write(i[a,b] + ", ");
-                    }
-                    Console.Write("], ");
-                }
-                Console.WriteLine("]");
+
+                Console.Write("], ");
             }
+
+            Console.WriteLine("]");
+            p.SendValue(i, (val) => SimpleConversion.ArrayToBytes<int>(val, SimpleConversion.NumberToBytes));
+            p.ExpectCmd(Ready);
+            p.WriteCmd(Go);
+            p.ExpectCmd(Done);
+            p.ExpectCmd(Receive);
+            var res = p.ReceiveValue(SimpleConversion.BytesToNumber<int>);
+            Console.WriteLine($"Received {res}");
         }
         catch (Exception e)
         {

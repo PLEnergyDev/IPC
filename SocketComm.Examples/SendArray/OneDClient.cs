@@ -22,27 +22,23 @@ public class OneDClient
             Console.WriteLine("]");
             p.WriteCmd(Ready);
             p.ExpectCmd(Go);
-            i = Bench(i);
+            var res = Bench(i);
             p.WriteCmd(Done);
-            Console.Write("Sending [");
-            foreach (var e in i)
-            {
-                Console.Write(e + ", ");
-            }
-            Console.WriteLine("]");
-            p.SendValue(i, (val) => SimpleConversion.ArrayToBytes<int>(val, SimpleConversion.NumberToBytes));
+            Console.WriteLine($"Sending {res}");
+            p.SendValue(res ,SimpleConversion.NumberToBytes);
             c = p.ReadCmd();
         }
         p.Dispose();
     }
 
-    public static int[] Bench(int[] i)
+    public static int Bench(int[] i)
     {
         var sum = 0;
         foreach (var e in i)
         {
             sum += e;
         }
-        return i.Select(v => v + sum).ToArray();
+
+        return sum;
     }
 }

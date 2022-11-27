@@ -8,7 +8,7 @@ public class IntServer {
         while (i < Integer.MAX_VALUE && i > 1)
         {
             System.out.printf("Sending %d\n", i);
-            p.SendValue(i, (val)-> ByteBuffer.allocate(4).putInt(val));
+            p.SendValue(i, (val) -> ByteBuffer.allocate(4).putInt(val));
             p.ExpectCmd(Cmd.Ready);
             p.WriteCmd(Cmd.Go);
             p.ExpectCmd(Cmd.Done);
