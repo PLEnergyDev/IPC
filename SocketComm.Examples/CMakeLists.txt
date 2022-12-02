@@ -26,3 +26,10 @@ add_executable(SendArray.OneDClient
 
 add_executable(SendArray.OneDServer
         SendArray/OneDServer.c ../CSocketComm/scomm.h ../CSocketComm/scomm.c ../CSocketComm/cmd.h ../CSocketComm/cmd.h ../CSocketComm/simpleConversion.c ../CSocketComm/simpleConversion.h)
+
+add_executable(SendArray.TwoDClient
+        SendArray/TwoDClient.c ../CSocketComm/scomm.h ../CSocketComm/scomm.c ../CSocketComm/cmd.h ../CSocketComm/cmd.h ../CSocketComm/simpleConversion.c ../CSocketComm/simpleConversion.h)
+
+add_executable(SendArray.TwoDServer
+        SendArray/TwoDServer.c ../CSocketComm/scomm.h ../CSocketComm/scomm.c ../CSocketComm/cmd.h ../CSocketComm/cmd.h ../CSocketComm/simpleConversion.c ../CSocketComm/simpleConversion.h)
+
