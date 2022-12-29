@@ -103,8 +103,16 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
     public void ShakeHands(Socket socket)
     {
         var data = BitConverter.GetBytes(MagicHandshakeValue);
+        if (BitConverter.IsLittleEndian)
+        {
+            data = data.Reverse().ToArray();
+        }
         socket.Send(data, SocketFlags.None);
         socket.Receive(data, SocketFlags.None);
+        if (BitConverter.IsLittleEndian)
+        {
+            data = data.Reverse().ToArray();
+        }
         ValidateHandshake(data);
     }
 
@@ -114,11 +122,20 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
         Int32 result;
         Logger.LogInformation("Waiting for handshake");
         socket.Receive(data, SocketFlags.None);
+        if (BitConverter.IsLittleEndian)
+        {
+            data = data.Reverse().ToArray();
+        }
         result = BitConverter.ToInt32(data);
         Logger.LogInformation($"[{nameof(ReceiveHandshake)}] Read: {Convert.ToHexString(data)}/{result}");
-        BitConverter.GetBytes(MagicHandshakeValue).CopyTo(data.AsMemory());
-        socket.Send(data);
         ValidateHandshake(data);
+        BitConverter.GetBytes(MagicHandshakeValue).CopyTo(data.AsMemory());
+        if (BitConverter.IsLittleEndian)
+        {
+            data = data.Reverse().ToArray();
+        }
+        socket.Send(data);
+        
     }
 
     public async Task<Cmd> ReadCmdAsync(CancellationToken ct = default)
@@ -203,12 +220,14 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
 
     public void Dispose()
     {
+        Logger.LogInformation("Closing pipe");
         S?.Dispose();
         GC.SuppressFinalize(this);
     }
 
     public ValueTask DisposeAsync()
     {
+        Logger.LogInformation("Closing pipe async");
         S?.Dispose();
         GC.SuppressFinalize(this);
         return ValueTask.CompletedTask;
@@ -234,5 +253,35 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
             r = await ReadCmdAsync(cancellationToken);
             yield return r;
         } while(r > Exit);
+    }
+
+    public void SendValue<T>(T value, Func<T,byte[]> converter)
+    {
+        WriteCmd(Receive);
+        ExpectCmd(Ready);
+        var buf = converter(value);
+        byte[] length = SimpleConversion.NumberToBytes(buf.Length);
+        S.Send(length);
+        S.Send(buf);
+        ExpectCmd(Ok);
+    }
+
+    public T ReceiveValue<T>(Func<byte[], T> converter)
+    {
+        WriteCmd(Ready);
+        byte[] buffer = new byte[4];
+        S.Receive(buffer);
+        var length = SimpleConversion.BytesToNumber<int>(buffer);
+        Console.WriteLine($"Receiving {length} bytes!");
+        buffer = new byte[length];
+        var rec = S.Receive(buffer);
+        if (rec != length)
+        {
+            //TODO: throw error, maybe try repeat
+            Console.WriteLine($"Expected {length}, received {rec}");
+        }
+
+        WriteCmd(Ok);
+        return converter(buffer);
     }
 }

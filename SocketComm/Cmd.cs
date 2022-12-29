@@ -2,7 +2,7 @@
 {
     public enum Cmd
     {
-        Unkown = -3,
+        Unknown = -3,
         Error = -2,
         Stopped = -1,
         Exit = 0,
@@ -10,5 +10,6 @@
         Done = 2,
         Ready = 3,
         Ok=4,
+        Receive=5
     }
 }

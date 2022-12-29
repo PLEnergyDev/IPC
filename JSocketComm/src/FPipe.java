@@ -7,6 +7,8 @@ import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 public class FPipe implements AutoCloseable, Iterable<Cmd> {
     final int MagicHandshakeValue = 25;
@@ -15,6 +17,7 @@ public class FPipe implements AutoCloseable, Iterable<Cmd> {
     public FPipe(String file) throws IOException {
 
         UnixDomainSocketAddress address = UnixDomainSocketAddress.of(file);
+        System.out.println("Connecting...");
         if (Files.exists(Path.of(file)))
         {
             channel = SocketChannel.open(StandardProtocolFamily.UNIX);
@@ -27,11 +30,12 @@ public class FPipe implements AutoCloseable, Iterable<Cmd> {
             ss.bind(address);
             channel = ss.accept();
             ss.close();
+            Files.delete(Path.of(file));
             System.out.println("handshake...");
             ReceiveHand(channel);
             System.out.println("done");
-
         }
+        System.out.println("Connection successful!");
     }
 
     public Cmd ReadCmd() throws IOException{
@@ -52,6 +56,31 @@ public class FPipe implements AutoCloseable, Iterable<Cmd> {
             return read;
         }
         throw new PipeCmdException(String.format("Expected: %s - Received: %s", cmd, read));
+    }
+
+    public <T> void SendValue(T value, Function<T, ByteBuffer> converter) throws IOException, PipeCmdException {
+        WriteCmd(Cmd.Receive);
+        ExpectCmd(Cmd.Ready);
+        var buf = converter.apply(value).rewind();
+        ByteBuffer bb = ByteBuffer.allocate(4).putInt(buf.capacity()).rewind();
+        channel.write(bb);
+        channel.write(buf);
+        ExpectCmd(Cmd.Ok);
+    }
+
+    public <T> T ReceiveValue(Function<ByteBuffer, T> converter) throws IOException {
+        WriteCmd(Cmd.Ready);
+        var bb = ByteBuffer.allocate(4);
+        channel.read(bb);
+        var length = bb.rewind().getInt();
+        System.out.println("Receiving " + length + " bytes!");
+        bb = ByteBuffer.allocate(length);
+        var rec = channel.read(bb);
+        if(rec != length){
+            // TODO: throw error
+        }
+        WriteCmd(Cmd.Ok);
+        return converter.apply(bb.rewind());
     }
 
 
