@@ -272,13 +272,13 @@ public class FPipe : IDisposable, IAsyncDisposable, IEnumerable<Cmd>, IAsyncEnum
         byte[] buffer = new byte[4];
         S.Receive(buffer);
         var length = SimpleConversion.BytesToNumber<int>(buffer);
-        Console.WriteLine($"Receiving {length} bytes!");
+        Logger.LogInformation($"Receiving {length} bytes!");
         buffer = new byte[length];
         var rec = S.Receive(buffer);
         if (rec != length)
         {
             //TODO: throw error, maybe try repeat
-            Console.WriteLine($"Expected {length}, received {rec}");
+            Logger.LogError($"Expected {length}, received {rec}");
         }
 
         WriteCmd(Ok);
