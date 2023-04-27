@@ -1,3 +1,5 @@
+package JSocketComm;
+
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;

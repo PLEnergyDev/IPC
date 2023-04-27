@@ -1,3 +1,5 @@
+package JSocketComm;
+
 import java.io.IOException;
 import java.net.StandardProtocolFamily;
 import java.net.UnixDomainSocketAddress;
@@ -9,6 +11,7 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
+
 
 public class FPipe implements AutoCloseable, Iterable<Cmd> {
     final int MagicHandshakeValue = 25;
@@ -121,7 +124,7 @@ public class FPipe implements AutoCloseable, Iterable<Cmd> {
             Cmd current = Cmd.Ok;
             @Override
             public boolean hasNext(){
-                return current.getValue()>Cmd.Exit.getValue();
+                return current.getValue()> Cmd.Exit.getValue();
             }
 
             @Override

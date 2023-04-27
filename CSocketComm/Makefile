@@ -11,3 +11,8 @@ scomm.o: scomm.c scomm.h
 conversion.o: simpleConversion.c simpleConversion.h scomm.o
 	gcc -c simpleConversion.c -o conversion.o
 
+libSocketComm.a: cmd.o scomm.o conversion.o
+	ar ruv libSocketComm.a cmd.o scomm.o conversion.o
+	ranlib libSocketComm.a
+
+

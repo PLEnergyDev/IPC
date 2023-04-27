@@ -1,3 +1,5 @@
+package JSocketComm;
+
 import javax.lang.model.type.ArrayType;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
